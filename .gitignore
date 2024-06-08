@@ -1,3 +1,5 @@
 .vs
 bin
 obj
+Properties
+BitcoinFinder/BitcoinFinder.csproj.user

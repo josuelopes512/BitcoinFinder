@@ -36,7 +36,7 @@ class Program
                 BigInteger min = ranges[walletIndex - 1].min;
                 BigInteger max = ranges[walletIndex - 1].max;
 
-                Console.WriteLine($"Carteira escolhida: {Cyan(answer)} Min: {Yellow(min.ToString())} Max: {Yellow(max.ToString())}");
+                Console.WriteLine($"Carteira escolhida: {Cyan(answer)} Min: {Yellow(min.ToString("x"))} Max: {Yellow(max.ToString("x"))}");
                 Console.WriteLine($"Numero possivel de chaves: {Yellow((BigInteger.Parse(max.ToString()) - BigInteger.Parse(min.ToString())).ToString("N0"))}");
 
                 BigInteger key = min;
@@ -47,8 +47,6 @@ class Program
 
                 switch (answer2)
                 {
-                    case "1":
-                        break;
                     case "2":
                         BuscaPorPocentagem(max, min);
                         break;
