@@ -1,6 +1,5 @@
 ﻿using NBitcoin;
 using System.Numerics;
-using SimpleBase;
 
 namespace BitcoinFinder
 {

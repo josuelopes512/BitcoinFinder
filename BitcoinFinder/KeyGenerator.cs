@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SimpleBase;
+using System.Numerics;
+using System.Security.Cryptography;
 
 namespace BitcoinFinder
 {
-    using SimpleBase;
-    using System;
-    using System.Numerics;
-    using System.Security.Cryptography;
 
     public class KeyGenerator
     {

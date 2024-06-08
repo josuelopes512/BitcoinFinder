@@ -31,16 +31,10 @@ class Program
         {
             if (int.TryParse(answer, out int walletIndex) && walletIndex >= 1 && walletIndex <= 160)
             {
-                List<(BigInteger min, BigInteger max)> ranges = LoadRanges();
+                (BigInteger min, BigInteger max) range = LoadRanges()[walletIndex - 1];
 
-                BigInteger min = ranges[walletIndex - 1].min;
-                BigInteger max = ranges[walletIndex - 1].max;
-
-                Console.WriteLine($"Carteira escolhida: {Cyan(answer)} Min: {Yellow(min.ToString("x"))} Max: {Yellow(max.ToString("x"))}");
-                Console.WriteLine($"Numero possivel de chaves: {Yellow((BigInteger.Parse(max.ToString()) - BigInteger.Parse(min.ToString())).ToString("N0"))}");
-
-                BigInteger key = min;
-
+                Console.WriteLine($"Carteira escolhida: {Cyan(answer)} Min: {Yellow(range.min.ToString("x"))} Max: {Yellow(range.max.ToString("x"))}");
+                Console.WriteLine($"Numero possivel de chaves: {Yellow((BigInteger.Parse(range.max.ToString()) - BigInteger.Parse(range.min.ToString())).ToString("N0"))}");
                 Console.Write($"Escolha uma opcao ({Cyan("1")} - Comecar do inicio, {Cyan("2")} - Escolher uma porcentagem, {Cyan("3")} - Escolher minimo): ");
                 
                 string answer2 = isDebug ? "2" : Console.ReadLine();
@@ -48,13 +42,13 @@ class Program
                 switch (answer2)
                 {
                     case "2":
-                        BuscaPorPocentagem(max, min);
+                        BuscaPorPocentagem(range);
                         break;
                     case "3":
-                        BuscaValorMinimo(max, min);
+                        BuscaValorMinimo(range.max);
                         break;
                     default:
-                        EncontrarBitcoins(key, min, max);
+                        EncontrarBitcoins(range.min, range);
                         break;
                 }
             }
@@ -75,12 +69,11 @@ class Program
         Console.CancelKeyPress += (sender, e) => shouldStop = true;
     }
 
-    private static void BuscaPorPocentagem(BigInteger max, BigInteger min)
+    private static void BuscaPorPocentagem((BigInteger min, BigInteger max) range)
     {
-        BigInteger key = min;
-
         Console.Write("Escolha um numero entre 0 e 1: ");
         string answer3 = isDebug ? "0.000001" : Console.ReadLine();
+
         if (decimal.TryParse(answer3, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal percentage) && percentage >= 0 && percentage <= 1)
         {
             BigInteger percentualRange = BigInteger.Divide(
@@ -88,17 +81,22 @@ class Program
                     new BigInteger(
                         Math.Floor(percentage * Convert.ToDecimal(1e18))
                     ),
-                    BigInteger.Subtract(max, min)
+                    BigInteger.Subtract(range.max, range.min)
                 ),
                 new BigInteger(1e18m)
             );
 
-            min = BigInteger.Add(min, percentualRange);
+            BigInteger min = BigInteger.Add(range.min, percentualRange);
 
             Console.WriteLine($"Comecando em: {Yellow("0x" + min.ToString("X"))}");
 
-            key = min;
-            EncontrarBitcoins(key, min, max);
+            (BigInteger min, BigInteger max) newrange = new ()
+            {
+                min = min,
+                max = range.max
+            };
+
+            EncontrarBitcoins(min, newrange);
         }
         else
         {
@@ -106,19 +104,21 @@ class Program
         }
     }
 
-    private static void BuscaValorMinimo(BigInteger max, BigInteger min)
+    private static void BuscaValorMinimo(BigInteger max)
     {
-        BigInteger key = min;
-
         Console.Write("Entre o minimo: ");
 
         string answer3 = Console.ReadLine();
 
         if (BigInteger.TryParse(answer3, out BigInteger newMin))
         {
-            min = newMin;
-            key = newMin;
-            EncontrarBitcoins(key, min, max);
+            (BigInteger min, BigInteger max) newrange = new()
+            {
+                min = newMin,
+                max = max
+            };
+
+            EncontrarBitcoins(newMin, newrange);
         }
         else
         {
@@ -135,7 +135,7 @@ class Program
     private static string Yellow(string text) => $"\x1b[33m{text}\x1b[0m";
     private static string RedBg(string text) => $"\x1b[41m{text}\x1b[0m";
 
-    private static void EncontrarBitcoins(BigInteger key, BigInteger min, BigInteger max)
+    private static void EncontrarBitcoins(BigInteger key, (BigInteger min, BigInteger max) range)
     {
         int segundos = 0;
         BigInteger pkey = 0;
@@ -201,7 +201,7 @@ class Program
             if (walletsSet.Contains(publicKey))
             {
                 var tempo = (DateTime.Now - startTime).TotalSeconds;
-                Console.WriteLine($"Velocidade: {(double)(key - min) / tempo} chaves por segundo");
+                Console.WriteLine($"Velocidade: {(double)(key - range.min) / tempo} chaves por segundo");
                 Console.WriteLine($"Tempo: {tempo} segundos");
                 Console.WriteLine($"Private key: {Green(privateKeyHex)}");
                 Console.WriteLine($"WIF: {Green(GenerateWIF(privateKeyHex))}");
