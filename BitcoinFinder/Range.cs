@@ -21,10 +21,7 @@ namespace BitcoinFinder
 
         public RangeConvert()
         {
-            foreach (Range range in ranges)
-            {
-                rangesList.Add((BitcoinFinder.Utils.ParseHex(range.Min), BitcoinFinder.Utils.ParseHex(range.Max)));
-            }
+            rangesList.AddRange(ranges.Select(r => (Utils.ParseHex(r.Min), Utils.ParseHex(r.Max))).ToList());
         }
     }
 }

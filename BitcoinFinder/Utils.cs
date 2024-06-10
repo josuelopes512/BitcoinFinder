@@ -1,5 +1,6 @@
 ﻿using NBitcoin;
 using System.Numerics;
+using System.Text;
 
 namespace BitcoinFinder
 {
@@ -77,7 +78,7 @@ namespace BitcoinFinder
             return new string(hexChars);
         }
 
-        static async Task<decimal> GetBitcoinBalance(string address)
+        public static async Task<decimal> GetBitcoinBalance(string address)
         {
             try
             {
@@ -95,5 +96,45 @@ namespace BitcoinFinder
                 return 0;
             }
         }
+
+        //private static string GenerateQRCode(string text)
+        //{
+        //    var barcodeWriter = new ZXing.BarcodeWriter
+        //    {
+        //        Format = BarcodeFormat.QR_CODE,
+        //        Options = new ZXing.Common.EncodingOptions
+        //        {
+        //            Width = 250,
+        //            Height = 250
+        //        }
+        //    };
+
+        //    var result = barcodeWriter.Write(text);
+        //    using (var ms = new System.IO.MemoryStream())
+        //    {
+        //        result.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+        //        return Convert.ToBase64String(ms.ToArray());
+        //    }
+        //}
+
+        //private static string ConvertBitMatrixToAscii(BitMatrix matrix)
+        //{
+        //    QRCodeWriter qRCodeWriter = new QRCodeWriter();
+
+        //    StringBuilder sb = new StringBuilder();
+
+        //    for (int y = 0; y < matrix.Height; y++)
+        //    {
+        //        for (int x = 0; x < matrix.Width; x++)
+        //        {
+        //            // Se o bit na posição (x, y) estiver ativado, adicione um caractere preto ('█'), caso contrário, adicione um caractere branco (' ')
+        //            char character = matrix[x, y] ? '█' : ' ';
+        //            sb.Append(character);
+        //        }
+        //        sb.AppendLine();
+        //    }
+
+        //    return sb.ToString();
+        //}
     }
 }
